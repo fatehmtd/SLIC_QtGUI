@@ -1,6 +1,6 @@
 # SLIC_QtGui
 
-This is an implementation of the famous SLIC (Simple Linear Interactive Clustering) algorithm for superpixel oversegmentation.
+This is an implementation of the famous SLIC (Simple Linear Iterative Clustering) algorithm for superpixel oversegmentation.
 
 TODO:
 + implement a gpgpu (opencl, cuda) version for faster processing
