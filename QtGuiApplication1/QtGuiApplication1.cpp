@@ -8,6 +8,8 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include "SLIC.h"
+#include <QMessageBox>
+#include <QFileInfo>
 
 QtGuiApplication1::QtGuiApplication1(QWidget *parent)
 	: QMainWindow(parent)
@@ -42,6 +44,17 @@ QtGuiApplication1::QtGuiApplication1(QWidget *parent)
 			if (_oversegmentedImage.isNull()) return;
 			ui.imageHolder->setPixmap(QPixmap::fromImage(!state ? _oversegmentedImage : _edgeImage));
 		});
+
+	connect(ui.btnExport, &QPushButton::clicked, [=]() 
+		{
+			auto file = QFileDialog::getSaveFileName(this, "Export results to", "", "*.jpg;*.bmp;*.png;");
+			if (file.isEmpty()) return; // exit if no filename provided
+
+			// save the results
+			QFileInfo finfo(file);
+			_edgeImage.save(finfo.absoluteDir().absoluteFilePath(QString("Edges-%1").arg(finfo.fileName())));
+			_oversegmentedImage.save(finfo.absoluteDir().absoluteFilePath(QString("SLIC-%1").arg(finfo.fileName())));
+		});
 }
 
 void QtGuiApplication1::onProcess()
@@ -64,6 +77,7 @@ void QtGuiApplication1::onProcess()
 
 			ui.imageHolder->setPixmap(QPixmap::fromImage(!ui.valueEdges->isChecked() ? _oversegmentedImage : _edgeImage));
 			progressDlg.cancel();
+			ui.btnExport->setEnabled(true);
 		});
 
 	auto execSLic = [](float s, float m, float c, const QImage& image, int loop) -> SLIC::SLICResult
